@@ -64,6 +64,11 @@ class ProductController {
         return res.status(400).json({ message: "Todos los campos son requeridos" })
       }
 
+      // VALIDACIONES DE INPUT
+      // validar el tipo de data que recibo del front
+      // 1 - si para la validación creo el producto
+      // 2 - si no pasa la validación retorno una respuesta 400 al front
+
       const dataToValidate = {
         name,
         description,
@@ -94,7 +99,9 @@ class ProductController {
       const { id } = req.params
       const { body } = req
 
-      if (!Types.ObjectId.isValid(id)) res.status(400).json({ succes: false, error: "ID Inválido" })
+      if (!Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ success: false, error: "ID Inválido" })
+      }
 
       const validator = updatedProductSchema.safeParse(body)
 
