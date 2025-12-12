@@ -1,0 +1,109 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/products
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Laptop Gaming ASUS",
+    "description": "Laptop de alto rendimiento para gaming con RTX 4060",
+    "price": 1299.99,
+    "category": "Electrónica",
+    "stock": 5
+  }
+}
+
+docs {
+  # Crear Producto
+  
+  Crea un nuevo producto. **Requiere autenticación con token JWT**.
+  
+  ## Autenticación
+  
+  Debes haber hecho login previamente para obtener el token.
+  El token se incluye automáticamente en el header `Authorization: Bearer {token}`.
+  
+  ## Request Body
+  
+  Todos los campos son requeridos:
+  
+  - `name` (string): Nombre del producto
+    - Mínimo 4, máximo 100 caracteres
+  
+  - `description` (string): Descripción del producto
+    - Mínimo 10, máximo 500 caracteres
+  
+  - `price` (number): Precio del producto
+    - Mínimo 10, máximo 1,000,000
+  
+  - `category` (string): Categoría del producto
+    - Mínimo 2, máximo 50 caracteres
+  
+  - `stock` (number): Cantidad en stock
+    - Debe ser entero positivo
+    - Máximo 100,000
+  
+  ## Validaciones
+  
+  Zod valida automáticamente todos los campos. Si alguno no cumple las reglas,
+  recibirás un error 400 con detalles específicos de qué campo falló.
+  
+  ## Respuesta Exitosa (201)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "_id": "...",
+      "name": "Laptop Gaming ASUS",
+      "description": "Laptop de alto rendimiento...",
+      "price": 1299.99,
+      "category": "Electrónica",
+      "stock": 5,
+      "image": "No contiene imagen",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+  
+  ## Errores Posibles
+  - 400: Datos inválidos (campos vacíos, fuera de rango, etc.)
+  - 401: No autenticado o token inválido/expirado
+  - 500: Error del servidor
+}
+
+tests {
+  test("Status code is 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("Product was created successfully", function() {
+    expect(res.body).to.have.property('success', true);
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.have.property('_id');
+  });
+  
+  test("Product has all required fields", function() {
+    const product = res.body.data;
+    expect(product).to.have.property('name');
+    expect(product).to.have.property('description');
+    expect(product).to.have.property('price');
+    expect(product).to.have.property('category');
+    expect(product).to.have.property('stock');
+  });
+}

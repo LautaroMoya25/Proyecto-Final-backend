@@ -1,0 +1,33 @@
+meta {
+  name: Backend UTN API
+  type: collection
+  version: 1.0.0
+}
+
+docs {
+  # Backend UTN - Colección de API
+  
+  Esta colección contiene todos los endpoints de la API REST del proyecto Backend UTN.
+  
+  ## Configuración
+  
+  Variables de entorno disponibles:
+  - `baseUrl`: URL base de la API (local: http: //localhost:3000, producción: https://tu-app.onrender.com)
+  - `token`: Token JWT obtenido del login (se configura automáticamente)
+  
+  ## Orden de ejecución
+  
+  1. **Auth - Register**: Crear una nueva cuenta
+  2. **Auth - Login**: Obtener token JWT (se guarda automáticamente)
+  3. **Products - Get All**: Ver todos los productos
+  4. **Products - Get All with Filters**: Filtrar productos
+  5. **Products - Get by ID**: Ver un producto específico
+  6. **Products - Create**: Crear nuevo producto (requiere autenticación)
+  7. **Products - Update**: Actualizar producto (requiere autenticación)
+  8. **Products - Delete**: Eliminar producto (requiere autenticación)
+}
+
+vars {
+  baseUrl: http: //localhost:3000
+  token:
+}

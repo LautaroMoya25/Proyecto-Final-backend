@@ -1,0 +1,108 @@
+meta {
+  name: Update Product
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/products/PRODUCT_ID_HERE
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "price": 1199.99,
+    "stock": 8
+  }
+}
+
+docs {
+  # Actualizar Producto
+  
+  Actualiza un producto existente. **Requiere autenticación con token JWT**.
+  
+  ## Autenticación
+  
+  Debes haber hecho login previamente para obtener el token.
+  
+  ## Uso
+  
+  1. Reemplaza `PRODUCT_ID_HERE` en la URL con el ID del producto a actualizar
+  2. En el body, incluye solo los campos que quieres actualizar
+  
+  ## Request Body
+  
+  **Todos los campos son opcionales** (puedes actualizar solo lo que necesites):
+  
+  - `name` (string, opcional): Nuevo nombre
+  - `description` (string, opcional): Nueva descripción
+  - `price` (number, opcional): Nuevo precio
+  - `category` (string, opcional): Nueva categoría
+  - `stock` (number, opcional): Nuevo stock
+  
+  ## Ejemplo: Actualizar solo precio y stock
+  ```json
+  {
+    "price": 899.99,
+    "stock": 15
+  }
+  ```
+  
+  ## Ejemplo: Actualizar solo descripción
+  ```json
+  {
+    "description": "Nueva descripción actualizada del producto"
+  }
+  ```
+  
+  ## Validaciones
+  
+  Los campos que sí envíes deben cumplir las mismas reglas que en Create Product.
+  Zod valida automáticamente usando `partial()` (todos los campos opcionales).
+  
+  ## Respuesta Exitosa (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "_id": "...",
+      "name": "Laptop Gaming ASUS",
+      "price": 1199.99,
+      "stock": 8,
+      ...
+    }
+  }
+  ```
+  
+  ## Errores Posibles
+  - 400: ID inválido o datos inválidos
+  - 401: No autenticado o token inválido/expirado
+  - 404: Producto no encontrado
+  - 500: Error del servidor
+}
+
+tests {
+  test("Status code is 200 or 404", function() {
+    expect([200, 404]).to.include(res.status);
+  });
+  
+  test("Response has expected structure", function() {
+    expect(res.body).to.have.property('success');
+  });
+  
+  test("If successful, product was updated", function() {
+    if (res.status === 200) {
+      expect(res.body).to.have.property('data');
+      expect(res.body.data).to.have.property('_id');
+    }
+  });
+}

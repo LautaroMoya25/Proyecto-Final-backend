@@ -1,0 +1,71 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "test@ejemplo.com",
+    "password": "password123"
+  }
+}
+
+docs {
+  # Registro de Usuario
+  
+  Crea una nueva cuenta de usuario.
+  
+  ## Request Body
+  - `email` (string, required): Email válido del usuario
+  - `password` (string, required): Contraseña (mínimo 6 caracteres)
+  
+  ## Validaciones
+  - Email debe ser válido y tener entre 5-100 caracteres
+  - Contraseña debe tener entre 6-50 caracteres
+  
+  ## Rate Limit
+  ⚠️ Esta ruta tiene límite de 10 peticiones cada 15 minutos
+  
+  ## Respuesta Exitosa (201)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "_id": "...",
+      "email": "test@ejemplo.com"
+    }
+  }
+  ```
+  
+  ## Errores Posibles
+  - 400: Datos inválidos o email ya registrado
+  - 429: Límite de peticiones excedido
+  - 500: Error del servidor
+}
+
+tests {
+  test("Status code is 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("Response has success property", function() {
+    expect(res.body).to.have.property('success');
+    expect(res.body.success).to.be.true;
+  });
+  
+  test("Response has user data", function() {
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.have.property('email');
+  });
+}

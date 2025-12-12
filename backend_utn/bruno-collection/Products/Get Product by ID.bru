@@ -1,0 +1,53 @@
+meta {
+  name: Get Product by ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/products/PRODUCT_ID_HERE
+  body: none
+  auth: none
+}
+
+docs {
+  # Obtener Producto por ID
+  
+  Obtiene un producto específico por su ID de MongoDB.
+  
+  ## Uso
+  
+  Reemplaza `PRODUCT_ID_HERE` en la URL con un ID real de MongoDB.
+  
+  Ejemplo: `/products/507f1f77bcf86cd799439011`
+  
+  ## Respuesta Exitosa (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "_id": "507f1f77bcf86cd799439011",
+      "name": "Laptop Dell",
+      "description": "Laptop potente",
+      "price": 999.99,
+      "category": "Electrónica",
+      "stock": 10
+    }
+  }
+  ```
+  
+  ## Errores Posibles
+  - 400: ID inválido (formato incorrecto)
+  - 404: Producto no encontrado
+  - 500: Error del servidor
+}
+
+tests {
+  test("Status code is 200 or 404", function() {
+    expect([200, 404]).to.include(res.status);
+  });
+  
+  test("Response has expected structure", function() {
+    expect(res.body).to.have.property('success');
+  });
+}

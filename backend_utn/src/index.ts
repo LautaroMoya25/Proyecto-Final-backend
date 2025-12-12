@@ -24,7 +24,14 @@ declare global {
 const PORT = process.env.PORT
 const app = express()
 
-app.use(cors())
+// Configuración de CORS para permitir conexión con frontend
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || '*', // En producción usar URL específica del frontend
+  credentials: true, // Permitir cookies y headers de autenticación
+  optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(logger)
 

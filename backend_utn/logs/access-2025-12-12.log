@@ -1,0 +1,2 @@
+::1 GET /products? 200 26 - 65.215 ms
+::1 GET /products? 304 - - 54.709 ms

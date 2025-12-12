@@ -1,0 +1,79 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "test@ejemplo.com",
+    "password": "password123"
+  }
+}
+
+script:post-response {
+  // Guardar el token automáticamente en las variables de entorno
+  if (res.body && res.body.token) {
+    bru.setVar("token", res.body.token);
+    console.log("✅ Token guardado automáticamente");
+  }
+}
+
+docs {
+  # Login de Usuario
+  
+  Inicia sesión y obtiene un token JWT.
+  
+  ## Request Body
+  - `email` (string, required): Email del usuario registrado
+  - `password` (string, required): Contraseña del usuario
+  
+  ## Rate Limit
+  ⚠️ Esta ruta tiene límite de 10 peticiones cada 15 minutos
+  
+  ## Respuesta Exitosa (200)
+  ```json
+  {
+    "success": true,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+  ```
+  
+  **IMPORTANTE**: El token se guarda automáticamente en la variable `{{token}}` 
+  y se usará en las siguientes peticiones que requieran autenticación.
+  
+  ## Duración del Token
+  - El token JWT expira en 1 hora
+  - Después de 1 hora necesitarás hacer login nuevamente
+  
+  ## Errores Posibles
+  - 400: Credenciales inválidas
+  - 401: Email o contraseña incorrectos
+  - 429: Límite de peticiones excedido
+  - 500: Error del servidor
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response has token", function() {
+    expect(res.body).to.have.property('token');
+    expect(res.body.token).to.be.a('string');
+  });
+  
+  test("Token is saved to environment", function() {
+    expect(bru.getVar("token")).to.not.be.empty;
+  });
+}

@@ -1,0 +1,72 @@
+meta {
+  name: Delete Product
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/products/PRODUCT_ID_HERE
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  # Eliminar Producto
+  
+  Elimina un producto de la base de datos. **Requiere autenticación con token JWT**.
+  
+  ## Autenticación
+  
+  Debes haber hecho login previamente para obtener el token.
+  
+  ## Uso
+  
+  Reemplaza `PRODUCT_ID_HERE` en la URL con el ID del producto a eliminar.
+  
+  Ejemplo: `/products/507f1f77bcf86cd799439011`
+  
+  ## Precaución
+  
+  ⚠️ **Esta acción es irreversible**. El producto se eliminará permanentemente de la base de datos.
+  
+  ## Respuesta Exitosa (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "_id": "507f1f77bcf86cd799439011",
+      "name": "Laptop Gaming ASUS",
+      ...
+    }
+  }
+  ```
+  
+  La respuesta incluye los datos del producto eliminado.
+  
+  ## Errores Posibles
+  - 400: ID inválido (formato incorrecto)
+  - 401: No autenticado o token inválido/expirado
+  - 404: Producto no encontrado (ya fue eliminado o nunca existió)
+  - 500: Error del servidor
+}
+
+tests {
+  test("Status code is 200 or 404", function() {
+    expect([200, 404]).to.include(res.status);
+  });
+  
+  test("Response has expected structure", function() {
+    expect(res.body).to.have.property('success');
+  });
+  
+  test("If successful, returns deleted product data", function() {
+    if (res.status === 200) {
+      expect(res.body).to.have.property('data');
+      expect(res.body.data).to.have.property('_id');
+    }
+  });
+}

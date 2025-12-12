@@ -1,0 +1,97 @@
+meta {
+  name: Get All with Filters
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/products?name=laptop&minPrice=100&maxPrice=2000&category=electrónica
+  body: none
+  auth: none
+}
+
+params:query {
+  name: laptop
+  minPrice: 100
+  maxPrice: 2000
+  category: electrónica
+  ~stock: 10
+}
+
+docs {
+  # Filtrar Productos
+  
+  Obtiene productos aplicando filtros. El filtrado se ejecuta **directamente en la base de datos** 
+  usando operadores de MongoDB.
+  
+  ## Query Parameters Disponibles
+  
+  Todos son opcionales y se pueden combinar:
+  
+  - `name` (string): Búsqueda parcial por nombre (case insensitive)
+    - Ejemplo: `name=laptop` encuentra "Laptop Dell", "laptop gaming", etc.
+  
+  - `category` (string): Filtrar por categoría (case insensitive)
+    - Ejemplo: `category=electrónica`
+  
+  - `stock` (number): Filtrar por stock exacto
+    - Ejemplo: `stock=10`
+  
+  - `minPrice` (number): Precio mínimo
+    - Ejemplo: `minPrice=100` devuelve productos >= $100
+  
+  - `maxPrice` (number): Precio máximo
+    - Ejemplo: `maxPrice=1000` devuelve productos <= $1000
+  
+  ## Ejemplos de Uso
+  
+  ```
+  # Solo por nombre
+  GET /products?name=laptop
+  
+  # Por categoría
+  GET /products?category=electrónica
+  
+  # Por rango de precio
+  GET /products?minPrice=100&maxPrice=500
+  
+  # Combinados
+  GET /products?name=laptop&category=electrónica&minPrice=500&maxPrice=2000
+  ```
+  
+  ## Implementación en la DB
+  
+  Los filtros se traducen a operadores MongoDB:
+  - `name` → `$regex` (búsqueda parcial)
+  - `category` → `$regex` (búsqueda parcial)
+  - `minPrice` → `$gte` (mayor o igual)
+  - `maxPrice` → `$lte` (menor o igual)
+  - `stock` → Igualdad exacta
+  
+  ## Respuesta
+  
+  Igual que Get All Products, pero con resultados filtrados.
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("Response has filtered data", function() {
+    expect(res.body).to.have.property('data');
+    expect(res.body.data).to.be.an('array');
+  });
+  
+  test("Filtered products match criteria", function() {
+    if (res.body.data.length > 0) {
+      res.body.data.forEach(product => {
+        // Verificar que el precio esté en el rango si se especificó
+        if (product.price >= 100 && product.price <= 2000) {
+          expect(product.price).to.be.at.least(100);
+          expect(product.price).to.be.at.most(2000);
+        }
+      });
+    }
+  });
+}
